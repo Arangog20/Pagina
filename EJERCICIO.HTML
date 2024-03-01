@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    -- CREAR VIEWS 
+--1
+CREATE VIEW vista_vehiculos as 
+SELECT * 
+FROM vehiculos
+WHERE modelo = "2024"
+
+DROP VIEW vista_vehiculos
+
+SELECT * FROM vista_vehiculos
+
+--2
+CREATE VIEW vista_coid_tipolores AS
+SELECT*
+FROM colores 
+WHERE color = "blanco"
+
+SELECT * FROM vista_colores
+
+--3
+
+CREATE VIEW vista_tipos AS
+SELECT vehiculos.modelo, tipo_vehiculo.tipo
+FROM vehiculos
+INNER JOIN tipo_vehiculo
+WHERE vehiculos.id_tipo = tipo_vehiculo.id
+
+DROP VIEW  vista_tipos
+
+SELECT * FROM vista_tipos
+
+--4
+select * from vehiculos
+
+SELECT * FROM tipo_vehiculo
+
+SELECT * FROM marcas
+
+CREATE VIEW vista_marcas AS
+SELECT vehiculos.placa, marcas.marca
+FROM vehiculos
+INNER JOIN tipo_vehiculo 
+INNER JOIN marcas
+WHERE vehiculos.id_tipo = tipo_vehiculo.id and tipo_vehiculo.id_marca = marcas.id 
+
+drop view vista_marcas
+
+SELECT * FROM vista_marcas
+ 
+--5
+
+CREATE VIEW vista_placas AS
+SELECT placa
+FROM vehiculos
+
+SELECT * FROM vista_placas
+
+-- CREAR PROCEDIMIENTOS
+--1
+DELIMITER //
+CREATE PROCEDURE vehiculos_con_numero(IN numero VARCHAR (10))
+BEGIN 
+SELECT * FROM vehiculos WHERE placa LIKE numero;
+END //
+DELIMITER;
+
+CALL vehiculos_con_numero("1")
+
+drop Procedure vehiculos_con_numero
+
+--2 OBTIENE INFORMACION
+DELIMITER $$ 
+CREATE PROCEDURE getVehiculos (IN v_id INT)
+BEGIN
+    SELECT * FROM vehiculos WHERE v_id = id;
+END $$ -- Agregué el delimitador al final del bloque del procedimiento almacenado
+DELIMITER ;
+
+CALL getVehiculos(3);
+
+DROP PROCEDURE getVehiculos;
+
+--3 CREAR INFORMACION
+
+DELIMITER $$
+CREATE PROCEDURE addVehiculo(IN a_modelo VARCHAR(45), a_placa VARCHAR(45), a_id_color INT(45),a_id_tipo INT(45))
+BEGIN
+    INSERT INTO vehiculos(modelo,placa,id_color,id_tipo)VALUES(a_modelo,a_placa,a_id_color,a_id_tipo);
+    SELECT CONCAT ('ahora hay', COUNT(id), 'vehiculos') AS 'RESULTADO' FROM vehiculos;
+END $$
+DELIMITER;
+
+CALL addVehiculo('2020','789qwe',1,2)
+
+--4 CAMBIAR INFORMACION 
+
+DELIMITER $$
+CREATE PROCEDURE changeVehiculos(IN modelo_change VARCHAR(45))
+BEGIN 
+    UPDATE vehiculos
+    SET modelo = modelo_change
+    WHERE modelo = '2015';
+END $$
+DELIMITER;
+
+CALL changeVehiculos('2025')
+
+SELECT * FROM vehiculos;
+
+--5 ELIMINAR INFORMACION
+DELIMITER $$
+CREATE PROCEDURE deleteVehiculos(IN id_vehiculos INT)
+BEGIN
+    DELETE FROM vehiculos
+    WHERE id = id_vehiculos;
+END $$
+DELIMITER;
+
+CALL deleteVehiculos(8);
+</body>
+</html>
